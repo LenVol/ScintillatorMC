@@ -34,7 +34,7 @@ Analysis::Analysis()
 
 
   cout<<"HEREEE"<<endl;
-  f1 = new TFile(Form("%s_%.0f_%.1f_%d_%d.root",theConfig->item_str["Model"].data(),theConfig->item_float["Energy"],theConfig->item_float["angle"],theConfig->item_int["thread"],theConfig->item_int["ANumber"]),"recreate");
+  f1 = new TFile(Form("%s/%s_%.0f_%.1f_%d_%d.root",theConfig->item_str["outDir"].data(),theConfig->item_str["Model"].data(),theConfig->item_float["Energy"],theConfig->item_float["angle"],theConfig->item_int["thread"],theConfig->item_int["ANumber"]),"recreate");
   f1->mkdir("PDDList");  f1->mkdir("YZProj");  f1->mkdir("YXProj");  f1->mkdir("ZXProj"); // Normal
   f1->mkdir("PDDList_Q");  f1->mkdir("ZXProj_Q");  f1->mkdir("YZProj_Q");  f1->mkdir("YXProj_Q"); // Quenched
 
@@ -82,7 +82,7 @@ Analysis::Analysis()
   Back          = new TProfile2D("Back", "Back", NbinsY, -theDetector->ScintHalfY, theDetector->ScintHalfY, NbinsZ, -theDetector->ScintHalfZ, theDetector->ScintHalfZ, "s");
 
   std::string line;
-  std::ifstream SPWater ("Water_Geant4_P.dat");
+  std::ifstream SPWater (theConfig->item_str["WETFile"].data());
   double data[3];
   while(getline(SPWater, line)) {
     stringstream ss(line);
@@ -96,6 +96,8 @@ Analysis::Analysis()
     t->Branch("x0",&x0,"x0/F");
     t->Branch("y0",&y0,"y0/F");
     t->Branch("z0",&z0,"z0/F");
+    t->Branch("y0pb",&y0pb,"y0pb/F");
+    t->Branch("z0pb",&z0pb,"z0pb/F");
   
     t->Branch("px0",&px0,"px0/F");
     t->Branch("py0",&py0,"py0/F");
@@ -131,6 +133,8 @@ Analysis::Analysis()
 void Analysis::RearFrontDetector(G4Step* aStep, G4String theName){
   f1->cd();
   if(theName=="FrontTracker"){
+    y0pb = theGenerator->y0; 
+    z0pb = theGenerator->z0; 
     x0  = aStep->GetPreStepPoint()->GetPosition()[0];
     y0  = aStep->GetPreStepPoint()->GetPosition()[1];
     z0  = aStep->GetPreStepPoint()->GetPosition()[2];
@@ -150,17 +154,18 @@ void Analysis::RearFrontDetector(G4Step* aStep, G4String theName){
     py1 = aStep->GetPreStepPoint()->GetMomentumDirection()[1];
     pz1 = aStep->GetPreStepPoint()->GetMomentumDirection()[2];
     Estop = aStep->GetPreStepPoint()->GetKineticEnergy();
-    if(aStep->GetTrack()->GetCreatorProcess()!=0) proc_name = aStep->GetTrack()->GetCreatorProcess()->GetProcessName();
-    else proc_name  = "primary";
     part_name  = aStep->GetTrack()->GetDynamicParticle()->GetDefinition()->GetParticleName();
     idPBY = theGenerator->idPBY;
     idPBZ = theGenerator->idPBZ;
-    if(part_name.compare("gamma")!=0 && part_name.compare("neutron")!=0 && part_name.compare("e-")!=0){      
+    
+    if(aStep->GetTrack()->GetCreatorProcess()!=0) proc_name = aStep->GetTrack()->GetCreatorProcess()->GetProcessName();
+    else{ proc_name  = "primary";
+   //if(part_name.compare("gamma")!=0 && part_name.compare("neutron")!=0 && part_name.compare("e-")!=0){     // These make it super slow! 
       double WET = findWET(Einit, Estop);
-      Front->Fill(y0,z0,WET);
-      Back->Fill(y1,z1,WET);
-      if(theConfig->item_int["saveTTree"]) t->Fill();
+      Front->Fill(y0,z0,WET); //single event so we can remove the non primaries
+      Back->Fill(y1,z1,WET); //For scintillator, Energy deposit, not WET
     }
+    if(theConfig->item_int["saveTTree"]) t->Fill();
   }
 }
 

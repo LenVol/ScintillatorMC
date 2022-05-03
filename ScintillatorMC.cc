@@ -105,7 +105,12 @@ int main(int ,char** argv) {
   G4String SourceType  = "Beam";       // []
   cfg.addItem("SourceType", SourceType);     
 
-  
+  G4String WETFile = "Water_Geant4_P.dat"; 
+  cfg.addItem("WETFile", WETFile); 
+ 
+  G4String outDir = "."; 
+  cfg.addItem("outDir", outDir);
+
   cfg.Configure();
   CLHEP::RanecuEngine *theRanGenerator = new CLHEP::RanecuEngine;  
   theRanGenerator->setSeed(thread);
@@ -150,7 +155,7 @@ int main(int ,char** argv) {
   runManager->BeamOn(NProton_tot);
   theAnalysis->SaveAndClose();
   calcRSP(theGenerator);
-  //calcStoppingPower(theGenerator, myDC);
+  calcStoppingPower(theGenerator, myDC);
   //delete visManager;
   return 0;
   delete runManager;
@@ -189,14 +194,14 @@ void calcStoppingPower(PrimaryGeneratorAction* theGenerator, DetectorConstructio
   G4EmCalculator* emCal = new G4EmCalculator;
 
   ofstream myfile;
-  myfile.open ("Water_Geant4.dat");
+  myfile.open (pCTconfig::GetInstance()->item_str["WETFile"].data());
   //G4MaterialTable *theMaterialTable = G4Material::GetMaterialTable();
   G4Material* water = myDC->water;//theMaterialTable->at(0);
   
   cout<<emCal->GetCSDARange(105.43*MeV,particle, myDC->water)*mm<<endl;
-  for(int j=1;j<50000;j++){
-    G4float dedx_w = emCal->ComputeElectronicDEDX( float(j)/10*MeV,particle,water);
-    myfile<<float(j)/10*MeV<<" "<<dedx_w*MeV/mm<<" "<<endl;
+  for(int j=1;j<30000*theGenerator->A;j++){
+    G4float dedx_w = emCal->ComputeElectronicDEDX( float(j)/100*MeV,particle,water);
+    myfile<<float(j)/100*MeV <<" "<<dedx_w*MeV/mm<<" "<<endl;
   }
   myfile.close();
 
