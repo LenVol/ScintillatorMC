@@ -1793,7 +1793,7 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
 					,"LungInflated","Oesophagus","Cartilage","Stomach", "Pancreas","Spleen","Ribs2and6","CorticalBone",
 					"vertebral_column_C4_ICRU_report_46", "red_marrow_Woodard_1986","Blood",
 					"UrinaryBladder","Gland_mean_Z_Woodard_1986","SmallIntestine","SmallIntestine","Gland_mean_Z_Woodard_1986","Heart",
-					"Cartilage","Lymph","Uterus","Thyroid","SoftTissue"};
+					"Cartilage","Lymph","Uterus","Thyroid","SoftTissue_LL"};
   
     vector<G4float> Threshold = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29};
     
@@ -1823,7 +1823,7 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
     param->SetNoVoxel(NbinsX,NbinsY,NbinsZ);
     param->SetMaterials(theMaterialList);
     param->SetMaterialIndices(materialIDs);
-    param->SetSkipEqualMaterials(true);
+    param->SetSkipEqualMaterials(false);
     param->BuildContainerSolid(cont_phys);
     param->CheckVoxelsFillContainer(cont_vol->GetXHalfLength(),cont_vol->GetYHalfLength(),cont_vol->GetZHalfLength());
     phantomPhys = new G4PVParameterised("phantomPhys",phantomVoxel_log,cont_log,kZAxis,param->GetNoVoxel(),param);
