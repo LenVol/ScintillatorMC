@@ -69,7 +69,7 @@ private:
   float Estop_scint;
   float L,dX; // quenched light emission
   float kB,A; // quenching parameters
-  float  x0=0,y0=0,z0=0,px0=1,py0=0,pz0=0;
+  float  x0=0,y0=0,z0=0,y0pb=0,z0pb=0,px0=1,py0=0,pz0=0;
 
   float  x1,y1,z1,px1,py1,pz1;
   float  theta_y1, theta_z1;
