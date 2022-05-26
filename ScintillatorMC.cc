@@ -54,7 +54,7 @@ int main(int ,char** argv) {
   G4float Thickness  = 30; // cm
   cfg.addItem("Thickness", Thickness);   
 
-  G4int   thread  = atoi(argv[2]); // []
+  G4int thread  = atoi(argv[2]); // []
   cfg.addItem("thread", thread);   
 
   G4int  ANumber  = 1; // Atomic Number

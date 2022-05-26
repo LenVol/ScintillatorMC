@@ -32,7 +32,8 @@ public:
 private:
   void AddParallelWorldProcess();
   G4EmConfigurator em_config;
-
+  
+  G4String pWorldName; 
   G4double cutForGamma;
   G4double cutForElectron;
   G4double cutForPositron;

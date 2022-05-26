@@ -136,6 +136,9 @@ void PhysicsList::ConstructProcess()
   //
   AddTransportation();
 
+  //Add parallel world processes
+  //AddParallelWorldProcess(); 
+
   // electromagnetic physics list
   //
   emPhysicsList->ConstructProcess();
@@ -254,7 +257,35 @@ void PhysicsList::AddPhysicsList(const G4String& name)
     throw std::runtime_error(ss.str());
   }
 }
-
+/////////////////////////////////////////////////////////////////////////////
+//void PhysicsList::AddParallelWorldProcess() {
+//  // Add parallel world process
+//  G4ParallelWorldProcess* theParallelWorldProcess                 = new G4ParallelWorldProcess("paraWorldProc");
+//  G4ParallelWorldScoringProcess* theParallelWorldScoringProcess   = new G4ParallelWorldScoringProcess("ParaWorldScoringProc");
+//
+//  theParallelWorldScoringProcess->SetParallelWorld(pWorldName);
+//  theParallelWorldProcess->SetParallelWorld(pWorldName);
+//  theParallelWorldProcess->SetLayeredMaterialFlag();
+//  theParticleIterator->reset();
+//
+//  while ( (*theParticleIterator)() ) {
+//    G4ParticleDefinition* particle = theParticleIterator->value();
+//    if ( !particle->IsShortLived() ) {
+//      G4ProcessManager* pmanager = particle->GetProcessManager();
+//      pmanager->AddProcess(theParallelWorldProcess);
+//      //pmanager->AddProcess(theParallelWorldScoringProcess);
+//      if ( theParallelWorldProcess->IsAtRestRequired(particle) ) { pmanager->SetProcessOrdering(theParallelWorldProcess,idxAtRest,9999); }
+//      pmanager->SetProcessOrdering(theParallelWorldProcess,idxAlongStep,1);
+//      pmanager->SetProcessOrdering(theParallelWorldProcess,idxPostStep,9999);
+//      //pmanager->SetProcessOrderingToLast(theParallelWorldScoringProcess, idxAtRest);
+//      //pmanager->SetProcessOrdering(theParallelWorldScoringProcess, idxAlongStep, 1);
+//      //pmanager->SetProcessOrderingToLast(theParallelWorldScoringProcess, idxPostStep);
+//
+//    }
+//  }
+//
+//
+//}
 /////////////////////////////////////////////////////////////////////////////
 void PhysicsList::AddStepMax()
 {

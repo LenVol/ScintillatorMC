@@ -112,6 +112,7 @@ Analysis::Analysis()
     t->Branch("py1",&py1,"py1/F");
     t->Branch("pz1",&pz1,"pz1/F");
     t->Branch("Estop",&Estop,"Estop/F");
+    t->Branch("WET", &WET, "WET/D"); 
     
     t->Branch("proc_name",&proc_name);
     t->Branch("part_name",&part_name);
@@ -142,7 +143,7 @@ void Analysis::RearFrontDetector(G4Step* aStep, G4String theName){
     px0 = aStep->GetPreStepPoint()->GetMomentumDirection()[0];
     py0 = aStep->GetPreStepPoint()->GetMomentumDirection()[1];
     pz0 = aStep->GetPreStepPoint()->GetMomentumDirection()[2];
-    Einit = theConfig->item_float["Energy"];
+    Einit = theConfig->item_float["Energy"]*theConfig->item_int["ANumber"];
 
   }
   else if(theName=="RearTracker"){
@@ -158,10 +159,11 @@ void Analysis::RearFrontDetector(G4Step* aStep, G4String theName){
     idPBY = theGenerator->idPBY;
     idPBZ = theGenerator->idPBZ;
     
-    if(aStep->GetTrack()->GetCreatorProcess()!=0) proc_name = aStep->GetTrack()->GetCreatorProcess()->GetProcessName();
-    else{ proc_name  = "primary";
+    //if(aStep->GetTrack()->GetCreatorProcess()!=0) proc_name = aStep->GetTrack()->GetCreatorProcess()->GetProcessName();
+    //else{ proc_name  = "primary";
+   if(aStep->GetTrack()->GetTrackID() == 1){
    //if(part_name.compare("gamma")!=0 && part_name.compare("neutron")!=0 && part_name.compare("e-")!=0){     // These make it super slow! 
-      double WET = findWET(Einit, Estop);
+      WET = findWET(Einit, Estop);
       Front->Fill(y0,z0,WET); //single event so we can remove the non primaries
       Back->Fill(y1,z1,WET); //For scintillator, Energy deposit, not WET
     }
@@ -401,9 +403,10 @@ void Analysis::SaveAndClose(){
 double Analysis::findWET(double Ein,double Eout){
   int it_Einit = lower_bound(Energy.begin(), Energy.end(), Ein)-Energy.begin();
   int it_Estop = lower_bound(Energy.begin(), Energy.end(), Eout)-Energy.begin();
-  double WET = 0 ;
+  double w = 0 ;
+  double E_step = Energy.at(1) - Energy.at(0); 
   for(int i=it_Estop;i<it_Einit;i++){
-    WET += 0.1/dEdXBins[i];
+    w += E_step/dEdXBins[i];
   }
-  return WET;
+  return w;
 }

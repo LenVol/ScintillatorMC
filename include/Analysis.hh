@@ -74,6 +74,7 @@ private:
   float  x1,y1,z1,px1,py1,pz1;
   float  theta_y1, theta_z1;
   float  Einit,Estop, EnergyMid,LET;
+  double WET; 
   int N;
   vector<double> Energy;
   vector<double> dEdXBins;
