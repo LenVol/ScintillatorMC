@@ -21,6 +21,7 @@
 #include "G4SystemOfUnits.hh"
 #include "G4PhysicalConstants.hh"
 #include "Analysis.hh"
+#include "G4RunManager.hh"
 
 Analysis* Analysis::theAnalysis=NULL;
 Analysis::~Analysis(){theAnalysis=NULL;}
@@ -33,7 +34,6 @@ Analysis::Analysis()
   theConfig         = pCTconfig::GetInstance();
 
 
-  cout<<"HEREEE"<<endl;
   f1 = new TFile(Form("%s/%s_%.0f_%.1f_%d_%d.root",theConfig->item_str["outDir"].data(),theConfig->item_str["Model"].data(),theConfig->item_float["Energy"],theConfig->item_float["angle"],theConfig->item_int["thread"],theConfig->item_int["ANumber"]),"recreate");
   f1->mkdir("PDDList");  f1->mkdir("YZProj");  f1->mkdir("YXProj");  f1->mkdir("ZXProj"); // Normal
   f1->mkdir("PDDList_Q");  f1->mkdir("ZXProj_Q");  f1->mkdir("YZProj_Q");  f1->mkdir("YXProj_Q"); // Quenched
@@ -84,8 +84,8 @@ Analysis::Analysis()
   std::string line;
   std::ifstream SPWater (theConfig->item_str["WETFile"].data());
   double data[3];
-  while(getline(SPWater, line)) {
-    stringstream ss(line);
+  while(std::getline(SPWater, line)) {
+    std::stringstream ss(line);
     for(int i=0;i<3;i++) ss >> data[i];
     Energy.push_back(data[0]);
     dEdXBins.push_back(data[1]);
@@ -116,6 +116,7 @@ Analysis::Analysis()
     
     t->Branch("proc_name",&proc_name);
     t->Branch("part_name",&part_name);
+    t->Branch("EventID",&EventID, "EventID/I"); 
     t->Branch("idPBY",&idPBY,"idPBY/I");
     t->Branch("idPBZ",&idPBZ,"idPBZ/I");
   }
@@ -156,6 +157,8 @@ void Analysis::RearFrontDetector(G4Step* aStep, G4String theName){
     pz1 = aStep->GetPreStepPoint()->GetMomentumDirection()[2];
     Estop = aStep->GetPreStepPoint()->GetKineticEnergy();
     part_name  = aStep->GetTrack()->GetDynamicParticle()->GetDefinition()->GetParticleName();
+
+    EventID = G4RunManager::GetRunManager()->GetCurrentEvent()->GetEventID(); 
     idPBY = theGenerator->idPBY;
     idPBZ = theGenerator->idPBZ;
     

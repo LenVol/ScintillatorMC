@@ -76,6 +76,7 @@ private:
   float  Einit,Estop, EnergyMid,LET;
   double WET; 
   int N;
+  int EventID; 
   vector<double> Energy;
   vector<double> dEdXBins;
 

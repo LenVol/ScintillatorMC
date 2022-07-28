@@ -224,6 +224,54 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
     G4LogicalVolume* WaterBox_log = new G4LogicalVolume(WaterBox, water, "WaterBox_log");
     new G4PVPlacement(rotExt,G4ThreeVector(0,0,0),"WaterBox_phys",WaterBox_log,cont_phys,false,0);
   }  
+  //----------------------------------------------------------------------------------------------------------------
+  // Staggered aluminum cube box phantom
+  //----------------------------------------------------------------------------------------------------------------
+  else if(thePhantom == "StaggeredCubes"){
+    //G4Material *Aluminium = new G4Material("Aluminum", 13, 26.98*g/mole, 2.7*g/cm3);
+    G4Material *material   = theMaterial->ConstructMaterial("CB230", 1.34); 
+    G4Box* WaterBox  = new G4Box("WaterBox", 20./2.*cm, 20./2.*cm, 20./2.*cm); // 20 cm in x
+    G4Box* AluminumBox = new G4Box("AluminumBox", 1*cm/2., 1*cm/2., 1*cm/2.);
+    G4LogicalVolume* WaterBox_log = new G4LogicalVolume(WaterBox, water, "WaterBox_log");
+    G4LogicalVolume* AluminumBox_log = new G4LogicalVolume(AluminumBox, material, "AluminumBox_log");
+    G4PVPlacement* WaterBox_phys = new G4PVPlacement(0,G4ThreeVector(0,0,0),"WaterBox_phys",WaterBox_log,cont_phys,false,0);
+
+    // stagger the cube
+    rotExt->rotateX(2.5*pi/180.);
+    new G4PVPlacement(rotExt, G4ThreeVector(0,0,0), "AluminumBox_phys", AluminumBox_log, WaterBox_phys, false,0);
+    new G4PVPlacement(rotExt, G4ThreeVector(-5*cm,-3.3*cm,-3.3*cm), "AluminumBox_phys", AluminumBox_log, WaterBox_phys, false,1);
+    new G4PVPlacement(rotExt, G4ThreeVector(-9*cm,-6.6*cm,-6.6*cm), "AluminumBox_phys", AluminumBox_log, WaterBox_phys, false,2);
+    new G4PVPlacement(rotExt, G4ThreeVector(5*cm,3.3*cm,3.3*cm), "AluminumBox_phys", AluminumBox_log, WaterBox_phys, false,3);
+    new G4PVPlacement(rotExt, G4ThreeVector(9*cm,6.6*cm,6.6*cm), "AluminumBox_phys", AluminumBox_log, WaterBox_phys, false,4);
+  }  
+  //---------------------------------------------------------------------------------------------------------------
+  // Staggered marker in lung box
+  // --------------------------------------------------------------------------------------------------------------
+  else if(thePhantom == "StaggeredFiducial"){
+    G4Box* TissueBox  = new G4Box("TissueBox", 5/2.*cm, 5/2.*cm, 5/2.*cm); // 20 cm in x
+    G4Box* LungBox   = new G4Box("LungBox", 10/2.*cm, 5./2.*cm,5./2.*cm); 
+    G4Sphere* MarkerSphere = new G4Sphere("MarkerSphere",0., 5./2.*mm, 0.,2*pi,0.,2*pi);
+    G4Material *AverageMaleSoftTissue          = theMaterial->ConstructMaterial("Average_male_soft_tissue_Woodard_1986",1.03);
+    G4Material *LungInflated                   = theMaterial->ConstructMaterial("Lung_Woodard_1986",0.26);
+    G4Material *Gold                           = G4NistManager::Instance()->FindOrBuildMaterial("G4_Au"); 
+
+    G4LogicalVolume* TissueBox_log = new G4LogicalVolume(TissueBox, AverageMaleSoftTissue, "TissueBox_log");
+    G4LogicalVolume* LungBox_log = new G4LogicalVolume(LungBox, LungInflated, "LungBox_log");
+    G4LogicalVolume* MarkerSphere_log = new G4LogicalVolume(MarkerSphere, Gold, "MarkerSphere_log");
+
+    G4PVPlacement* TissueBox_phys1 = new G4PVPlacement(rotExt,G4ThreeVector(-10/2*cm - 5/2.*cm,0,0),"TissueBox_phys1",TissueBox_log,cont_phys,false,0);
+    G4PVPlacement* TissueBox_phys2 = new G4PVPlacement(rotExt,G4ThreeVector(+10/2*cm + 5/2.*cm,0,0),"TissueBox_phys2",TissueBox_log,cont_phys,false,1);
+
+    G4PVPlacement* LungBox_phys = new G4PVPlacement(rotExt,G4ThreeVector(0,0,0),"LungBox_phys",LungBox_log,cont_phys,false,0);
+
+    // stagger the cube
+    rotExt->rotateX(2.5*pi/180.);
+    new G4PVPlacement(rotExt, G4ThreeVector(0,0,0), "MarkerSphere_phys1", MarkerSphere_log, LungBox_phys, false,0);
+    new G4PVPlacement(rotExt, G4ThreeVector(-1*cm,-0.75*cm,-0.75*cm), "MarkerSphere_phys2", MarkerSphere_log, LungBox_phys, false,1);
+    new G4PVPlacement(rotExt, G4ThreeVector(-4*cm,-1.5*cm,-1.5*cm), "MarkerSphere_phys3", MarkerSphere_log, LungBox_phys, false,2);
+    new G4PVPlacement(rotExt, G4ThreeVector(1*cm,0.75*cm,0.75*cm), "MarkerSphere_phys4", MarkerSphere_log, LungBox_phys, false,3);
+    new G4PVPlacement(rotExt, G4ThreeVector(4*cm,1.5*cm,1.5*cm), "MarkerSphere_phys5", MarkerSphere_log, LungBox_phys, false,4);
+  }
 
   //----------------------------------------------------------------------------------------------------------------
   // Gammex phantom
@@ -824,6 +872,7 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
   //----------------------------------------------------------------------------------------------------------------
 
   else if(thePhantom =="ManyEdge"){
+    
     G4Material *Aluminium = new G4Material("Aluminum", 13, 26.98*g/mole, 2.7*g/cm3);
     G4Box* Box = new G4Box("Box",4./2*cm,4./2*cm,4./2*cm);
     G4LogicalVolume* Log = new G4LogicalVolume(Box,Aluminium ,"Log");
